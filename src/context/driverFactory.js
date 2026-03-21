@@ -1,5 +1,6 @@
 const MySQLDriver = require('@cubejs-backend/mysql-driver');
 const { UNIWARE_CONFIG, WAREHOUSE_CONFIG } = require('../config');
+const log = require('../logger');
 
 /**
  * Step 3 of the 4-function chain.
@@ -13,14 +14,17 @@ const { UNIWARE_CONFIG, WAREHOUSE_CONFIG } = require('../config');
  */
 function driverFactory({ securityContext: ctx, dataSource }) {
   if (dataSource === 'shared_warehouse') {
+    log.debug({ dataSource }, 'driver_warehouse');
     return new MySQLDriver(WAREHOUSE_CONFIG);
   }
 
   const hostConfig = UNIWARE_CONFIG[ctx.cloud];
   if (!hostConfig) {
+    log.error({ cloud: ctx.cloud }, 'driver_unknown_cloud');
     throw new Error(`Unknown cloud: ${ctx.cloud}`);
   }
 
+  log.debug({ cloud: ctx.cloud, host: hostConfig.host }, 'driver_cloud');
   return new MySQLDriver({
     ...hostConfig,
     user: process.env.DB_USER,

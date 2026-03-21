@@ -2,12 +2,13 @@
  * Cube.js configuration — wires together modular components.
  *
  * Architecture (4-function chain per request):
- *   1. checkAuth          — JWT verify → securityContext { tenant_id, cloud_id, role }
- *   2. contextToOrchestratorId — cloud_id → isolated cache slab + refresh queue
- *   3. driverFactory       — cloud_id → MySQL host | 'shared_warehouse' → Postgres
- *   4. queryRewrite        — inject WHERE tenant_id = ctx.tenant_id (server-side)
+ *   1. checkAuth              — JWT verify → securityContext { tenant_code, cloud, role }
+ *   2. contextToOrchestratorId — cloud → isolated cache slab + refresh queue
+ *   3. driverFactory           — cloud → MySQL host | 'shared_warehouse' → warehouse MySQL
+ *   4. queryRewrite            — inject WHERE tenant_code = ctx.tenant_code (server-side)
  */
 
+const log = require('./src/logger');
 const checkAuth = require('./src/auth/checkAuth');
 const {
   contextToOrchestratorId,
@@ -22,6 +23,14 @@ module.exports = {
   driverFactory,
   queryRewrite,
   scheduledRefreshContexts,
+
+  logger: (msg, params) => {
+    const isError = /error/i.test(msg);
+    const level = isError ? 'error' : 'info';
+    const { securityContext, ...rest } = params;
+
+    log[level]({ cloud: securityContext?.cloud, msg, ...rest }, msg);
+  },
 
   orchestratorOptions: {
     queryCacheOptions: {

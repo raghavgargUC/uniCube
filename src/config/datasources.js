@@ -1,24 +1,24 @@
 /**
- * Uniware datasource configuration — maps cloud to MySQL host + pool settings.
+ * Uniware datasource configuration — parses cloud hosts from UNIWARE_HOSTS env var.
  *
- * UNIWARE_CONFIG keys must exactly match:
+ * UNIWARE_HOSTS format (JSON):
+ *   { "cloud_key": { "host": "...", "database": "...", "pool": { "min": 1, "max": 5 } }, ... }
+ *
+ * Keys must exactly match:
  *   - cloud values in JWTs
  *   - entries returned by scheduledRefreshContexts
  * A mismatch causes cache misses and Cube falls through to MySQL on every request.
  */
 
-const UNIWARE_CONFIG = {
-  ecloud3: {
-    host: 'db-slave.ecloud3-in.unicommerce.infra',
-    database: 'uniware',
-    pool: { min: 1, max: 5 },
-  },
-  replica_c3: {
-    host: 'replica-c3.in.unicommerce.infra',
-    database: 'Cloud30',
-    pool: { min: 1, max: 5 },
-  },
-};
+const log = require('../logger');
+
+let UNIWARE_CONFIG = {};
+try {
+  UNIWARE_CONFIG = JSON.parse(process.env.UNIWARE_HOSTS || '{}');
+} catch (err) {
+  log.error({ error: err.message }, 'Failed to parse UNIWARE_HOSTS env var');
+  process.exit(1);
+}
 
 const WAREHOUSE_CONFIG = {
   host: process.env.WAREHOUSE_HOST || 'db.reco-stg-in.unicommerce.infra',

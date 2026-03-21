@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const config = require('../config');
+const log = require('../logger');
 
 /**
  * Express middleware that validates an incoming JWT (issued by Uniware/Orchestrator)
@@ -13,6 +14,7 @@ function tokenBridge(req, res, next) {
   const token = authHeader.replace(/^Bearer\s+/i, '');
 
   if (!token) {
+    log.warn({ path: req.path }, 'bridge_missing_token');
     return res.status(401).json({ error: 'Missing authorization token' });
   }
 
@@ -27,6 +29,7 @@ function tokenBridge(req, res, next) {
 
     next();
   } catch (err) {
+    log.warn({ path: req.path, error: err.message }, 'bridge_invalid_token');
     return res.status(401).json({ error: `Invalid token: ${err.message}` });
   }
 }
