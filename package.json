@@ -1,0 +1,28 @@
+{
+  "name": "unicube",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "dev": "node index.js",
+    "start": "NODE_ENV=production node index.js",
+    "dev:refresh": "CUBEJS_REFRESH_WORKER=true node index.js"
+  },
+  "keywords": [
+    "cube",
+    "analytics",
+    "multi-tenant"
+  ],
+  "author": "",
+  "license": "ISC",
+  "description": "Modular Cube.js analytics layer with multi-tenant auth, session management, and multi-datasource routing",
+  "dependencies": {
+    "@cubejs-backend/mysql-driver": "^1.6.24",
+    "@cubejs-backend/server": "^1.6.24",
+    "@cubejs-backend/server-core": "^1.6.24",
+    "dotenv": "^17.3.1",
+    "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
+    "pino": "^10.3.1",
+    "pino-pretty": "^13.1.3"
+  }
+}
