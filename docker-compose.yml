@@ -2,28 +2,20 @@ version: "3.8"
 
 services:
   cube:
-    image: cubejs/cube:latest
+    build: .
     ports:
       - "${PORT:-4000}:4000"
     env_file:
       - .env
-    volumes:
-      - ./cube.js:/cube/conf/cube.js:ro
-      - ./src:/cube/conf/src:ro
-      - ./model:/cube/conf/model:ro
     depends_on:
       - cubestore
 
   cube_refresh_worker:
-    image: cubejs/cube:latest
+    build: .
     env_file:
       - .env
     environment:
       CUBEJS_REFRESH_WORKER: "true"
-    volumes:
-      - ./cube.js:/cube/conf/cube.js:ro
-      - ./src:/cube/conf/src:ro
-      - ./model:/cube/conf/model:ro
     depends_on:
       - cubestore
 
