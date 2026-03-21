@@ -4,7 +4,7 @@ cube('OrphanReturnManifest', {
       t.code            AS tenant,
       f.display_name    AS facility_name,
       rmi.id            AS rmi_id,
-      rmi.created_at    AS created_at
+      rmi.created       AS created
     FROM return_manifest_item rmi
     INNER JOIN return_manifest rm ON rm.id = rmi.return_manifest_id
       AND rmi.shipping_package_id IS NULL
@@ -52,8 +52,8 @@ cube('OrphanReturnManifest', {
       type: 'string',
     },
 
-    created_at: {
-      sql: `created_at`,
+    created: {
+      sql: `created`,
       type: 'time',
     },
   },
