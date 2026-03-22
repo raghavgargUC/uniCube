@@ -2,11 +2,9 @@ const CubejsServer = require('@cubejs-backend/server');
 const express = require('express');
 const config = require('./src/config');
 const log = require('./src/logger');
-const tokenBridge = require('./src/auth/tokenBridge');
 
 const app = express();
 app.use(express.json());
-app.use(tokenBridge);
 
 app.get('/health', (_req, res) => res.json({ status: 'ok' }));
 
