@@ -26,11 +26,15 @@ module.exports = {
   queryRewrite,
   scheduledRefreshContexts,
 
-  schemaVersion: ({ securityContext }) =>
-    `v1_${securityContext.cloud || 'default'}`,
 
-  preAggregationsSchema: ({ securityContext }) =>
-    `pre_agg_${(securityContext.cloud || 'default').replace(/[^a-zA-Z0-9_]/g, '_')}`,
+  // schemaVersion: ({ securityContext }) =>
+  //   `v1_${securityContext.cloud || 'default'}`,
+
+  // preAggregationsSchema: ({ securityContext }) => {
+  //   const schema = `pre_agg_${(securityContext.cloud || 'default').replace(/[^a-zA-Z0-9_]/g, '_')}`;
+  //   log.info({ cloud: securityContext.cloud, schema }, 'pre_agg_schema_resolved');
+  //   return schema;
+  // },
 
   logger: (msg, params) => {
     const isError = /error/i.test(msg);
