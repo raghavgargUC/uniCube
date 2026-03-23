@@ -26,6 +26,9 @@ module.exports = {
   queryRewrite,
   scheduledRefreshContexts,
 
+  preAggregationsSchema: ({ securityContext }) =>
+    `pre_agg_${(securityContext.cloud || 'default').replace(/[^a-zA-Z0-9_]/g, '_')}`,
+
   logger: (msg, params) => {
     const isError = /error/i.test(msg);
     const level = isError ? 'error' : 'info';
