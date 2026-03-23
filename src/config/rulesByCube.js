@@ -8,7 +8,7 @@
  */
 // TODO add for key level
 module.exports = {
-  OrphanReturnManifest: [
-    { type: 'dateRange', key: 'created', maxDays: 90 },
-  ],
+  // OrphanReturnManifest: [
+  //   { type: 'dateRange', key: 'created', maxDays: 90 },
+  // ],
 };
