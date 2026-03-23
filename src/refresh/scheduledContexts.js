@@ -8,8 +8,13 @@ const { UNIWARE_CONFIG } = require('../config');
  * Adding a new model with its own refresh_key requires zero changes here.
  * This function automatically covers all configured clouds.
  */
+const log = require('../logger');
+
 async function scheduledRefreshContexts() {
-  return Object.keys(UNIWARE_CONFIG).map((cloud) => ({
+  log.info("inside scheduled refresh contexts");
+  const clouds = Object.keys(UNIWARE_CONFIG);
+  log.info({ clouds }, 'scheduled_refresh_contexts');
+  return clouds.map((cloud) => ({
     securityContext: { cloud, tenant_code: null },
   }));
 }
