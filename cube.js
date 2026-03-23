@@ -17,7 +17,6 @@ const {
 } = require('./src/context');
 const scheduledRefreshContexts = require('./src/refresh/scheduledContexts');
 
-console.log('>>> CUBE CONFIG LOADED <<<');
 log.info('Cube.js configuration loaded');
 
 module.exports = {

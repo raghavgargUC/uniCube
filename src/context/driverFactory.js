@@ -13,6 +13,8 @@ const log = require('../logger');
  * Connection pool is a hard gate — overflow waits in Cube, not on DB.
  */
 function driverFactory({ securityContext: ctx, dataSource }) {
+  
+  log.info("inside driver factory")
   if (dataSource === 'shared_warehouse') {
     log.info({ dataSource }, 'driver_warehouse');
     return new MySQLDriver(WAREHOUSE_CONFIG);
