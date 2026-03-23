@@ -14,7 +14,7 @@ const log = require('../logger');
  */
 function driverFactory({ securityContext: ctx, dataSource }) {
   
-  log.info("inside driver factory")
+  log.info({ cloud: ctx.cloud, dataSource }, 'driver_factory_called')
   if (dataSource === 'shared_warehouse') {
     log.info({ dataSource }, 'driver_warehouse');
     return new MySQLDriver(WAREHOUSE_CONFIG);
