@@ -4,7 +4,7 @@
 
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
 
-const rulesByCube = require('../../model/rulesByCube');
+const rulesByCube = require('../config/rulesByCube');
 
 /** @returns {number | null} */
 function spanDaysFromDateRange(dateRange) {
