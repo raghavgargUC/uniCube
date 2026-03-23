@@ -16,8 +16,7 @@ cube('OrphanReturnManifest', {
   data_source: 'default',
 
   refresh_key: {
-    every: '1 minute',
-    sql: `SELECT SLEEP(100), NOW()`,
+    every: '1 hour',
   },
 
   pre_aggregations: {
@@ -25,8 +24,7 @@ cube('OrphanReturnManifest', {
       measures: [CUBE.orphan_count],
       dimensions: [CUBE.tenant, CUBE.facility_name],
       refresh_key: {
-        every: '1 minute',
-        sql: `SELECT SLEEP(100), NOW()`,
+        every: '1 hour',
       },
     },
   },
