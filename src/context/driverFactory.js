@@ -14,7 +14,7 @@ const log = require('../logger');
  */
 function driverFactory({ securityContext: ctx, dataSource }) {
   if (dataSource === 'shared_warehouse') {
-    log.debug({ dataSource }, 'driver_warehouse');
+    log.info({ dataSource }, 'driver_warehouse');
     return new MySQLDriver(WAREHOUSE_CONFIG);
   }
 
@@ -24,7 +24,7 @@ function driverFactory({ securityContext: ctx, dataSource }) {
     throw new Error(`Unknown cloud: ${ctx.cloud}`);
   }
 
-  log.debug({ cloud: ctx.cloud, host: hostConfig.host }, 'driver_cloud');
+  log.info({ cloud: ctx.cloud, host: hostConfig.host }, 'driver_cloud');
   return new MySQLDriver({
     ...hostConfig,
     user: process.env.DB_USER,

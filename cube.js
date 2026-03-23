@@ -17,6 +17,9 @@ const {
 } = require('./src/context');
 const scheduledRefreshContexts = require('./src/refresh/scheduledContexts');
 
+log.info('Cube.js configuration loaded');
+
+
 module.exports = {
   checkAuth,
   contextToOrchestratorId,
@@ -32,6 +35,7 @@ module.exports = {
     log[level]({ cloud: securityContext?.cloud, msg, ...rest }, msg);
   },
 
+  // TODO need to remove it
   orchestratorOptions: {
     queryCacheOptions: {
       refreshKeyRenewalThreshold: 2,

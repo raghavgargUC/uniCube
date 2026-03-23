@@ -6,7 +6,11 @@
  * Extracts the cube name from the query's measures/dimensions and appends
  * a .tenant filter so each tenant only sees their own data.
  */
+const { validateQuery } = require('../validation');
+
 function queryRewrite(query, { securityContext: ctx }) {
+  validateQuery(query, { securityContext: ctx });
+
   if (!ctx || !ctx.tenant_code) return query;
 
   const firstMember =

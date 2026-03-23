@@ -3,6 +3,9 @@ const express = require('express');
 const config = require('./src/config');
 const log = require('./src/logger');
 
+// Cube reads this when the orchestrator starts (query result cache + queue driver).
+process.env.CUBEJS_CACHE_AND_QUEUE_DRIVER = config.CUBEJS_CACHE_AND_QUEUE_DRIVER;
+
 const app = express();
 app.use(express.json());
 
@@ -16,5 +19,9 @@ app.use((err, _req, res, _next) => {
 const server = new CubejsServer();
 
 server.listen({ port: config.PORT, app }).then(({ version, port }) => {
-  log.info({ version, port }, 'server_started');
+  log.info(
+    { version, port, cacheDriver: config.CUBEJS_CACHE_AND_QUEUE_DRIVER },
+    'server_started',
+  );
 });
+
