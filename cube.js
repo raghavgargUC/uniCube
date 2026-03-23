@@ -26,6 +26,9 @@ module.exports = {
   queryRewrite,
   scheduledRefreshContexts,
 
+  schemaVersion: ({ securityContext }) =>
+    `v1_${securityContext.cloud || 'default'}`,
+
   preAggregationsSchema: ({ securityContext }) =>
     `pre_agg_${(securityContext.cloud || 'default').replace(/[^a-zA-Z0-9_]/g, '_')}`,
 
