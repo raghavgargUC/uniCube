@@ -13,8 +13,23 @@ app.use((err, _req, res, _next) => {
   res.status(500).json({ error: 'Internal server error' });
 });
 
-const server = new CubejsServer();
+async function start() {
+  await config.MongoRegistry.init();
 
-server.listen({ port: config.PORT, app }).then(({ version, port }) => {
+  const server = new CubejsServer();
+  const { version, port } = await server.listen({ port: config.PORT, app });
   log.info({ version, port }, 'server_started');
+
+  const shutdown = async () => {
+    log.info('shutting_down');
+    await config.MongoRegistry.close();
+    process.exit(0);
+  };
+  process.on('SIGTERM', shutdown);
+  process.on('SIGINT', shutdown);
+}
+
+start().catch((err) => {
+  log.error({ err: err.message, stack: err.stack }, 'startup_failed');
+  process.exit(1);
 });

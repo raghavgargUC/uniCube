@@ -1,10 +1,12 @@
 require('dotenv').config();
 
 const { UNIWARE_CONFIG, WAREHOUSE_CONFIG } = require('./datasources');
+const MongoRegistry = require('./mongo');
 
 module.exports = {
   UNIWARE_CONFIG,
   WAREHOUSE_CONFIG,
+  MongoRegistry,
 
   CUBEJS_API_SECRET: process.env.CUBEJS_API_SECRET,
   CUBEJS_DEV_MODE: process.env.CUBEJS_DEV_MODE === 'true',

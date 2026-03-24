@@ -1,20 +1,31 @@
-const { UNIWARE_CONFIG } = require('../config');
+const { MongoRegistry } = require('../config');
 const log = require('../logger');
 
 /**
- * Generates one scheduledRefreshContext per cloud host.
- * Each context spawns its own refresh thread — fully isolated per cloud.
- * A slow Cloud 1 refresh never blocks Cloud 2–N.
+ * Generates one scheduledRefreshContext per subscribed tenant.
+ * Each context carries a subscriptions map so that repositoryFactory
+ * can load only the model files the tenant is subscribed to —
+ * no pre-agg tables are created for unsubscribed models.
  *
- * Adding a new model with its own refresh_key requires zero changes here.
- * This function automatically covers all configured clouds.
+ * Tenants on the same cloud share a MySQL driver (via driverFactory cache)
+ * but get their own CubeStore schema and orchestrator context.
  */
 async function scheduledRefreshContexts() {
-  const keys = Object.keys(UNIWARE_CONFIG);
-  log.debug({ clouds: keys, count: keys.length }, 'refresh_contexts');
-  return keys.map((cloud) => ({
-    securityContext: { cloud, tenant_code: null },
+  const tenants = MongoRegistry.getSubscribedTenants();
+
+  const contexts = tenants.map((t) => ({
+    securityContext: {
+      tenant_code: t.tenant_code,
+      cloud: t.cloud,
+      subscriptions: t.subscriptions,
+    },
   }));
+
+  log.debug(
+    { count: contexts.length, tenants: contexts.map((c) => c.securityContext.tenant_code) },
+    'refresh_contexts',
+  );
+  return contexts;
 }
 
 module.exports = scheduledRefreshContexts;
