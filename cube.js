@@ -97,6 +97,8 @@ module.exports = {
     );
   },
 
+  scheduledRefreshConcurrency: parseInt(process.env.REFRESH_CONCURRENCY, 10) || 2,
+
   orchestratorOptions: {
     queryCacheOptions: {
       refreshKeyRenewalThreshold: 2,
