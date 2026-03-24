@@ -32,11 +32,23 @@ async function close() {
 }
 
 async function _refresh() {
-  if (!db) return;
+  if (!db) {
+    log.warn('mongo_refresh_skipped: db is null (not connected)');
+    return;
+  }
   const [tenantCloudDocs, subDocs] = await Promise.all([
     db.collection('tenant_cloud_map').find({}).toArray(),
     db.collection('model_subscriptions').find({ active: true }).toArray(),
   ]);
+
+  log.debug(
+    { tenantCloudDocs: tenantCloudDocs.length, rawTenants: tenantCloudDocs.map(d => d.tenant_code) },
+    'mongo_raw_tenant_cloud_map',
+  );
+  log.debug(
+    { subDocs: subDocs.length, rawSubs: subDocs.map(d => ({ t: d.tenant_code, m: d.model, a: d.active })) },
+    'mongo_raw_model_subscriptions',
+  );
 
   const tenantCloud = new Map();
   for (const doc of tenantCloudDocs) {
@@ -71,12 +83,18 @@ function getCloudForTenant(tenantCode) {
  */
 function getSubscribedTenants() {
   _ensureCache();
-  if (!_cache.subscriptions) return [];
+  if (!_cache.subscriptions) {
+    log.debug({ dbConnected: !!db, cacheTs: _cache.ts }, 'mongo_no_subscriptions_in_cache');
+    return [];
+  }
 
   const tenantMap = new Map();
   for (const sub of _cache.subscriptions) {
     const cloud = _cache.tenantCloud?.get(sub.tenant_code);
-    if (!cloud) continue;
+    if (!cloud) {
+      log.debug({ tenant_code: sub.tenant_code }, 'mongo_skip_no_cloud_mapping');
+      continue;
+    }
 
     if (!tenantMap.has(sub.tenant_code)) {
       tenantMap.set(sub.tenant_code, {
@@ -89,7 +107,13 @@ function getSubscribedTenants() {
       refresh_every: sub.refresh_every || '1 hour',
     };
   }
-  return Array.from(tenantMap.values());
+
+  const result = Array.from(tenantMap.values());
+  log.debug(
+    { matchedTenants: result.length, tenants: result.map(t => t.tenant_code) },
+    'mongo_get_subscribed_tenants',
+  );
+  return result;
 }
 
 /**

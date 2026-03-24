@@ -21,6 +21,11 @@ async function scheduledRefreshContexts() {
     },
   }));
 
+  if (contexts.length === 0) {
+    log.warn('refresh_contexts: no subscribed tenants found, returning dummy context');
+    return [{ securityContext: { tenant_code: '__none__', cloud: 'default' } }];
+  }
+
   log.debug(
     { count: contexts.length, tenants: contexts.map((c) => c.securityContext.tenant_code) },
     'refresh_contexts',
