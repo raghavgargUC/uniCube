@@ -17,7 +17,7 @@ cube('OrphanReturnManifest', {
   data_source: 'default',
 
   refresh_key: {
-    sql: `SELECT CONCAT('${COMPILE_CONTEXT.securityContext.tenant_code}', ':OrphanReturnManifest', SLEEP(10))`,
+    sql: `SELECT CONCAT('${COMPILE_CONTEXT.securityContext.tenant_code}', ':OrphanReturnManifest', SLEEP(100))`,
     every: `${COMPILE_CONTEXT.securityContext.subscriptions?.OrphanReturnManifest?.refresh_every || '1 hour'}`,
   },
 
@@ -26,7 +26,7 @@ cube('OrphanReturnManifest', {
       measures: [CUBE.orphan_count],
       dimensions: [CUBE.tenant, CUBE.facility_name],
       refresh_key: {
-        sql: `SELECT CONCAT('${COMPILE_CONTEXT.securityContext.tenant_code}', ':OrphanReturnManifest', SLEEP(10))`,
+        sql: `SELECT CONCAT('${COMPILE_CONTEXT.securityContext.tenant_code}', ':OrphanReturnManifest', SLEEP(100))`,
         every: `${COMPILE_CONTEXT.securityContext.subscriptions?.OrphanReturnManifest?.refresh_every || '1 hour'}`,
       },
     },
