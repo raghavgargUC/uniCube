@@ -24,6 +24,12 @@ module.exports = {
   queryRewrite,
   scheduledRefreshContexts,
 
+  schemaVersion: ({ securityContext }) => {
+    const cloud = securityContext?.cloud || 'default';
+    log.debug({ cloud }, 'schema_version');
+    return cloud;
+  },
+
   preAggregationsSchema: ({ securityContext }) => {
     const env = process.env.NODE_ENV === 'production' ? 'prod' : 'dev';
     const cloud = securityContext?.cloud || 'default';

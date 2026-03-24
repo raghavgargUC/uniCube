@@ -5,6 +5,7 @@
  * single shared orchestrator context.
  */
 function contextToOrchestratorId({ securityContext: ctx, dataSource }) {
+  console.log("Orchestrator for cloud:", ctx?.cloud, "dataSource:", dataSource);
   if (dataSource === 'shared_warehouse') return 'shared';
   return ctx.cloud;
 }

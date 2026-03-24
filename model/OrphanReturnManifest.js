@@ -16,6 +16,7 @@ cube('OrphanReturnManifest', {
   data_source: 'default',
 
   refresh_key: {
+    sql: `SELECT '${SECURITY_CONTEXT.cloud}'`,
     every: '1 hour',
   },
 
@@ -24,6 +25,7 @@ cube('OrphanReturnManifest', {
       measures: [CUBE.orphan_count],
       dimensions: [CUBE.tenant, CUBE.facility_name],
       refresh_key: {
+        sql: `SELECT '${SECURITY_CONTEXT.cloud}'`,
         every: '1 hour',
       },
     },

@@ -23,7 +23,7 @@ function driverFactory({ securityContext: ctx, dataSource }) {
     log.error({ cloud: ctx.cloud }, 'driver_unknown_cloud');
     throw new Error(`Unknown cloud: ${ctx.cloud}`);
   }
-
+  console.log("Driver for cloud:", ctx.cloud);
   log.debug({ cloud: ctx.cloud, host: hostConfig.host }, 'driver_cloud');
   return new MySQLDriver({
     ...hostConfig,
