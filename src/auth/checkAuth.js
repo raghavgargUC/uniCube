@@ -19,6 +19,7 @@ function checkAuth(req, auth) {
 
   try {
     const decoded = jwt.verify(token, config.CUBEJS_API_SECRET);
+    if (decoded.cloud) decoded.cloud = decoded.cloud.toLowerCase();
     req.securityContext = decoded;
     log.debug({ cloud: decoded.cloud, tenant_code: decoded.tenant_code }, 'auth_success');
   } catch (err) {

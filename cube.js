@@ -24,6 +24,12 @@ module.exports = {
   queryRewrite,
   scheduledRefreshContexts,
 
+  preAggregationsSchema: ({ securityContext }) => {
+    const env = process.env.NODE_ENV === 'production' ? 'prod' : 'dev';
+    const cloud = securityContext?.cloud || 'default';
+    return `${env}_pre_aggregations_${cloud}`;
+  },
+
   logger: (msg, params) => {
     const isError = /error/i.test(msg);
     const level = isError ? 'error' : 'info';

@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cube.js vs Custom Service — Comparison</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<style>
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --border: #30363d;
+    --text: #e6edf3;
+    --muted: #8b949e;
+    --green: #3fb950;
+    --red: #f85149;
+    --yellow: #d29922;
+    --blue: #58a6ff;
+    --purple: #bc8cff;
+    --cyan: #39d2c0;
+    --orange: #f0883e;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    padding: 32px;
+    min-height: 100vh;
+  }
+  h1 {
+    font-family: 'Space Mono', monospace;
+    font-size: 22px;
+    margin-bottom: 6px;
+    color: var(--cyan);
+  }
+  .subtitle {
+    color: var(--muted);
+    font-size: 13px;
+    margin-bottom: 28px;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 28px;
+  }
+
+  .chart-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+  }
+  .chart-box h3 {
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 14px;
+  }
+
+  .comparison-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 28px;
+  }
+  .comparison-table th {
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 14px 18px;
+    text-align: left;
+    border-bottom: 2px solid var(--border);
+    color: var(--muted);
+  }
+  .comparison-table th:nth-child(2) { color: var(--purple); }
+  .comparison-table th:nth-child(3) { color: var(--cyan); }
+  .comparison-table td {
+    padding: 12px 18px;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+    vertical-align: top;
+    line-height: 1.5;
+  }
+  .comparison-table tr:last-child td { border-bottom: none; }
+  .comparison-table td:first-child {
+    font-weight: 700;
+    color: var(--text);
+    white-space: nowrap;
+  }
+
+  .tag {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    font-family: 'Space Mono', monospace;
+    padding: 2px 8px;
+    border-radius: 4px;
+    margin-right: 4px;
+  }
+  .tag-pro { background: rgba(63,185,80,0.15); color: var(--green); }
+  .tag-con { background: rgba(248,81,73,0.15); color: var(--red); }
+  .tag-neutral { background: rgba(210,153,34,0.15); color: var(--yellow); }
+
+  .verdict {
+    background: var(--surface);
+    border: 2px solid var(--cyan);
+    border-radius: 10px;
+    padding: 24px;
+  }
+  .verdict h2 {
+    font-family: 'Space Mono', monospace;
+    color: var(--cyan);
+    font-size: 16px;
+    margin-bottom: 12px;
+  }
+  .verdict p { color: var(--muted); line-height: 1.7; font-size: 14px; }
+  .verdict strong { color: var(--text); }
+
+  .canvas-wrap { position: relative; height: 220px; }
+
+  .explain-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 22px 24px;
+    margin-bottom: 28px;
+  }
+  .explain-box h3 {
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 14px;
+  }
+  .explain-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+  @media (max-width: 900px) {
+    .explain-grid { grid-template-columns: 1fr; }
+  }
+  .explain-col h4 {
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 10px;
+  }
+  .explain-col.cube h4 { color: var(--purple); }
+  .explain-col.custom h4 { color: var(--cyan); }
+  .explain-col ul {
+    margin: 0;
+    padding-left: 18px;
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.65;
+  }
+  .explain-col li { margin-bottom: 6px; }
+  .explain-footnote {
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px solid var(--border);
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.55;
+  }
+  .explain-footnote strong { color: var(--text); }
+</style>
+</head>
+<body>
+  <h1>Cube.js vs Custom Service (BullMQ + Redis)</h1>
+  <p class="subtitle">For: 100K pre-aggregations | 4-5 rows each | 1000 tenants | 20 MySQL hosts | dynamic per-tenant/facility conditions</p>
+
+  <div class="grid">
+    <div class="chart-box">
+      <h3>Resource Usage (100K pre-aggs)</h3>
+      <div class="canvas-wrap"><canvas id="resourceChart"></canvas></div>
+    </div>
+    <div class="chart-box">
+      <h3>Score by Dimension (higher = better)</h3>
+      <div class="canvas-wrap"><canvas id="radarChart"></canvas></div>
+    </div>
+  </div>
+
+  <div class="explain-box">
+    <h3>Why Cube.js uses more resources than Custom + Redis</h3>
+    <div class="explain-grid">
+      <div class="explain-col cube">
+        <h4>Cube.js (higher footprint)</h4>
+        <ul>
+          <li><strong>Memory:</strong> Cube Store keeps Parquet chunks, column metadata, and catalog entries for every pre-aggregation table. The server also holds <strong>compiled semantic models</strong> (per tenant/app id), query planners, and caches. Even tiny tables pay fixed overhead per table.</li>
+          <li><strong>Disk:</strong> Each pre-agg is stored as Parquet files plus Cube Store metadata. Small row counts still create files and directory structure; 100K tables means 100K logical objects on disk.</li>
+          <li><strong>Build time (worst case):</strong> A refresh run must orchestrate many builds, coordinate with MySQL, write to Cube Store, and update indexes. Throughput is bounded by concurrency settings and Cube Store write path, not only by row count.</li>
+          <li><strong>Startup:</strong> Cube.js loads drivers, may warm connections, and initializes Cube Store and the orchestrator. Heavier than a thin worker that only connects to Redis.</li>
+        </ul>
+      </div>
+      <div class="explain-col custom">
+        <h4>Custom + Redis (lower footprint)</h4>
+        <ul>
+          <li><strong>Memory:</strong> Redis stores <strong>only the result payload</strong> (e.g. a few KB of JSON per key). No OLAP engine, no per-table Parquet catalog, no compiled cube graph for 100K logical models.</li>
+          <li><strong>Disk:</strong> Redis persistence (if enabled) is compact strings or snapshots; no per-pre-agg Parquet file layout.</li>
+          <li><strong>Build time:</strong> A &ldquo;build&rdquo; is one SQL execution + <code>SET</code> in Redis. No second write layer after MySQL except cache update.</li>
+          <li><strong>Startup:</strong> Workers are stateless; they connect to Redis and MySQL and start processing jobs quickly.</li>
+        </ul>
+      </div>
+    </div>
+    <p class="explain-footnote">
+      <strong>Chart note:</strong> Bar values are <strong>illustrative order-of-magnitude</strong> for comparing the two approaches under ~100K cached units and small result sets. Actual numbers depend on hardware, Cube version, Redis mode, and tuning. The point is structural: Cube.js adds an <strong>analytics layer</strong> (semantic model + columnar store); Custom + Redis adds a <strong>thin cache</strong> on top of MySQL.
+    </p>
+  </div>
+
+  <table class="comparison-table">
+    <thead>
+      <tr>
+        <th>Dimension</th>
+        <th>Cube.js</th>
+        <th>Custom (BullMQ + Redis)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Dynamic Conditions</td>
+        <td>
+          <span class="tag tag-con">HARD</span>
+          Need repositoryFactory + template code gen + schema recompilation
+        </td>
+        <td>
+          <span class="tag tag-pro">EASY</span>
+          Parameterized SQL templates, just swap variables
+        </td>
+      </tr>
+      <tr>
+        <td>100K Models</td>
+        <td>
+          <span class="tag tag-con">RISKY</span>
+          Schema compilation memory &amp; time grows. LRU helps but 1000 tenants &times; 20 cubes = pressure
+        </td>
+        <td>
+          <span class="tag tag-pro">TRIVIAL</span>
+          100K Redis keys, ~50MB total. No compilation step
+        </td>
+      </tr>
+      <tr>
+        <td>Memory Usage</td>
+        <td>
+          <span class="tag tag-neutral">~1-2 GB</span>
+          Cube Store + compiled schemas + Parquet metadata
+        </td>
+        <td>
+          <span class="tag tag-pro">~100 MB</span>
+          Redis: 100K keys &times; ~500 bytes = 50MB. Workers: minimal
+        </td>
+      </tr>
+      <tr>
+        <td>Refresh Control</td>
+        <td>
+          <span class="tag tag-neutral">LIMITED</span>
+          scheduledRefreshConcurrency + maxConcurrency. No per-job priority, retry, or backoff
+        </td>
+        <td>
+          <span class="tag tag-pro">FULL</span>
+          BullMQ: priorities, rate limits, retries, backoff, dead letter, cron per job
+        </td>
+      </tr>
+      <tr>
+        <td>Multi-tenant Security</td>
+        <td>
+          <span class="tag tag-pro">BUILT-IN</span>
+          securityContext, queryRewrite, checkAuth &mdash; battle-tested
+        </td>
+        <td>
+          <span class="tag tag-neutral">YOU BUILD</span>
+          Middleware + Redis key namespacing. Not hard, but you own it
+        </td>
+      </tr>
+      <tr>
+        <td>Ad-hoc Analytics</td>
+        <td>
+          <span class="tag tag-pro">EXCELLENT</span>
+          Playground, semantic layer, drill-downs, time series, joins
+        </td>
+        <td>
+          <span class="tag tag-con">NONE</span>
+          Cache-only. No query engine, no exploration
+        </td>
+      </tr>
+      <tr>
+        <td>Subscription API</td>
+        <td>
+          <span class="tag tag-con">BOLT-ON</span>
+          No native concept. Build externally + wire into repositoryFactory
+        </td>
+        <td>
+          <span class="tag tag-pro">NATIVE</span>
+          It's your service &mdash; CRUD subscriptions + BullMQ job lifecycle
+        </td>
+      </tr>
+      <tr>
+        <td>Monitoring</td>
+        <td>
+          <span class="tag tag-neutral">LOGS</span>
+          Pre-agg build logs, Playground UI in dev mode
+        </td>
+        <td>
+          <span class="tag tag-pro">DASHBOARD</span>
+          Bull Board UI: job status, failures, retries, queue depth
+        </td>
+      </tr>
+      <tr>
+        <td>Facility-level Conditions</td>
+        <td>
+          <span class="tag tag-con">COMPLEX</span>
+          Template generates OR clauses per facility, recompile per tenant
+        </td>
+        <td>
+          <span class="tag tag-pro">SIMPLE</span>
+          Each facility = separate job with its own SQL params
+        </td>
+      </tr>
+      <tr>
+        <td>Horizontal Scaling</td>
+        <td>
+          <span class="tag tag-neutral">OK</span>
+          Add CUBEJS_REFRESH_WORKER=true instances. Shared Cube Store needed
+        </td>
+        <td>
+          <span class="tag tag-pro">EXCELLENT</span>
+          Add worker processes. Redis is the shared state. Stateless workers
+        </td>
+      </tr>
+      <tr>
+        <td>Dev Complexity</td>
+        <td>
+          <span class="tag tag-pro">LOW</span>
+          Framework handles most wiring. Less code to write initially
+        </td>
+        <td>
+          <span class="tag tag-neutral">MEDIUM</span>
+          ~500-800 lines of code to build the core. More upfront work
+        </td>
+      </tr>
+      <tr>
+        <td>Vendor Lock-in</td>
+        <td>
+          <span class="tag tag-con">YES</span>
+          Tied to Cube.js model format, Cube Store, APIs
+        </td>
+        <td>
+          <span class="tag tag-pro">NONE</span>
+          Standard Node.js + Redis. Swap any component
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="verdict">
+    <h2>Verdict for Your Use Case</h2>
+    <p>
+      <strong>Custom service wins</strong> for the alert/subscription system (100K dynamic pre-aggs, tiny data, per-tenant/facility conditions).
+      <strong>Cube.js wins</strong> if you later need ad-hoc analytical queries, dashboards, or data exploration.
+      <br><br>
+      <strong>Best strategy:</strong> Build the alert subscription engine as a custom service (BullMQ + Redis).
+      Keep Cube.js for complex analytical queries that need a semantic layer. They can coexist &mdash; same MySQL sources, different purposes.
+    </p>
+  </div>
+
+<script>
+Chart.defaults.color = '#8b949e';
+Chart.defaults.font.family = "'DM Sans', sans-serif";
+
+new Chart(document.getElementById('resourceChart'), {
+  type: 'bar',
+  data: {
+    labels: ['Memory', 'Disk', 'Build Time\n(worst case)', 'Startup Time'],
+    datasets: [
+      {
+        label: 'Cube.js',
+        data: [1500, 1000, 21, 30],
+        backgroundColor: 'rgba(188,140,255,0.7)',
+        borderColor: 'rgba(188,140,255,1)',
+        borderWidth: 1,
+        borderRadius: 4,
+      },
+      {
+        label: 'Custom + Redis',
+        data: [100, 50, 4, 2],
+        backgroundColor: 'rgba(57,210,192,0.7)',
+        borderColor: 'rgba(57,210,192,1)',
+        borderWidth: 1,
+        borderRadius: 4,
+      }
+    ]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { position: 'top', labels: { padding: 16, usePointStyle: true, pointStyle: 'rectRounded' } },
+      tooltip: {
+        callbacks: {
+          label: ctx => {
+            const units = ['MB', 'MB', 'min', 'sec'];
+            return `${ctx.dataset.label}: ${ctx.raw} ${units[ctx.dataIndex]}`;
+          }
+        }
+      }
+    },
+    scales: {
+      x: { grid: { color: '#21262d' }, ticks: { font: { size: 11 } } },
+      y: { grid: { color: '#21262d' }, ticks: { font: { size: 11 } },
+        title: { display: true, text: 'MB / min / sec (varies)', color: '#484f58', font: { size: 10 } }
+      }
+    }
+  }
+});
+
+new Chart(document.getElementById('radarChart'), {
+  type: 'radar',
+  data: {
+    labels: ['Dynamic\nConfig', 'Scalability', 'Refresh\nControl', 'Analytics', 'Dev Speed', 'Monitoring'],
+    datasets: [
+      {
+        label: 'Cube.js',
+        data: [4, 6, 5, 10, 8, 5],
+        backgroundColor: 'rgba(188,140,255,0.15)',
+        borderColor: 'rgba(188,140,255,0.8)',
+        borderWidth: 2,
+        pointBackgroundColor: 'rgba(188,140,255,1)',
+        pointRadius: 4,
+      },
+      {
+        label: 'Custom + Redis',
+        data: [10, 9, 10, 2, 6, 9],
+        backgroundColor: 'rgba(57,210,192,0.15)',
+        borderColor: 'rgba(57,210,192,0.8)',
+        borderWidth: 2,
+        pointBackgroundColor: 'rgba(57,210,192,1)',
+        pointRadius: 4,
+      }
+    ]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { position: 'top', labels: { padding: 16, usePointStyle: true, pointStyle: 'rectRounded' } }
+    },
+    scales: {
+      r: {
+        min: 0, max: 10,
+        ticks: { stepSize: 2, color: '#484f58', backdropColor: 'transparent', font: { size: 10 } },
+        grid: { color: '#21262d' },
+        angleLines: { color: '#21262d' },
+        pointLabels: { color: '#8b949e', font: { size: 11 } }
+      }
+    }
+  }
+});
+</script>
+</body>
+</html>

@@ -4,17 +4,18 @@
  * UNIWARE_HOSTS format (JSON):
  *   { "cloud_key": { "host": "...", "database": "...", "pool": { "min": 1, "max": 5 } }, ... }
  *
- * Keys must exactly match:
- *   - cloud values in JWTs
- *   - entries returned by scheduledRefreshContexts
- * A mismatch causes cache misses and Cube falls through to MySQL on every request.
+ * Keys are lowercased at parse time so lookups from JWTs and
+ * scheduledRefreshContexts are always case-insensitive.
  */
 
 const log = require('../logger');
 
 let UNIWARE_CONFIG = {};
 try {
-  UNIWARE_CONFIG = JSON.parse(process.env.UNIWARE_HOSTS || '{}');
+  const raw = JSON.parse(process.env.UNIWARE_HOSTS || '{}');
+  for (const [key, value] of Object.entries(raw)) {
+    UNIWARE_CONFIG[key.toLowerCase()] = value;
+  }
 } catch (err) {
   log.error({ error: err.message }, 'Failed to parse UNIWARE_HOSTS env var');
   process.exit(1);
