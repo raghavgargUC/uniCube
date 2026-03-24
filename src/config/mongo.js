@@ -70,7 +70,9 @@ async function _refresh() {
 }
 
 function _ensureCache() {
-  if (Date.now() - _cache.ts > CACHE_TTL_MS && db) {
+  const age = Date.now() - _cache.ts;
+  log.debug({ age, ttl: CACHE_TTL_MS, stale: age > CACHE_TTL_MS, dbConnected: !!db }, 'mongo_ensure_cache');
+  if (age > CACHE_TTL_MS && db) {
     _refresh().catch((err) =>
       log.error({ error: err.message }, 'mongo_cache_refresh_failed'),
     );
