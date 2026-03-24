@@ -4,7 +4,7 @@ cube('OrphanReturnManifest', {
       t.code            AS tenant,
       f.display_name    AS facility_name,
       rmi.id            AS rmi_id,
-      rmi.created       AS created
+      rmi.created       AS created,
     FROM return_manifest_item rmi
     INNER JOIN return_manifest rm ON rm.id = rmi.return_manifest_id
       AND rmi.shipping_package_id IS NULL
@@ -17,7 +17,7 @@ cube('OrphanReturnManifest', {
   data_source: 'default',
 
   refresh_key: {
-    sql: `SELECT CONCAT('${COMPILE_CONTEXT.securityContext.tenant_code}', ':OrphanReturnManifest')`,
+    sql: `SELECT CONCAT('${COMPILE_CONTEXT.securityContext.tenant_code}', ':OrphanReturnManifest', SLEEP(10))`,
     every: `${COMPILE_CONTEXT.securityContext.subscriptions?.OrphanReturnManifest?.refresh_every || '1 hour'}`,
   },
 
@@ -26,7 +26,7 @@ cube('OrphanReturnManifest', {
       measures: [CUBE.orphan_count],
       dimensions: [CUBE.tenant, CUBE.facility_name],
       refresh_key: {
-        sql: `SELECT CONCAT('${COMPILE_CONTEXT.securityContext.tenant_code}', ':OrphanReturnManifest')`,
+        sql: `SELECT CONCAT('${COMPILE_CONTEXT.securityContext.tenant_code}', ':OrphanReturnManifest', SLEEP(10))`,
         every: `${COMPILE_CONTEXT.securityContext.subscriptions?.OrphanReturnManifest?.refresh_every || '1 hour'}`,
       },
     },
