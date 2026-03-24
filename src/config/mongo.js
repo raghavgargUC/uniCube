@@ -10,6 +10,7 @@ let db = null;
 let _cache = { tenantCloud: null, subscriptions: null, ts: 0 };
 
 async function init() {
+  if (db) return;
   const uri = process.env.MONGO_URI;
   log.info({ uri: uri ? uri.replace(/\/\/.*@/, '//***@') : '(not set)' }, 'mongo_init_start');
   if (!uri) {

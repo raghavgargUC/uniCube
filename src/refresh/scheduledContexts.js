@@ -11,6 +11,7 @@ const log = require('../logger');
  * but get their own CubeStore schema and orchestrator context.
  */
 async function scheduledRefreshContexts() {
+  await MongoRegistry.init();
   const tenants = MongoRegistry.getSubscribedTenants();
 
   const contexts = tenants.map((t) => ({
