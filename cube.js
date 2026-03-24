@@ -27,7 +27,9 @@ module.exports = {
   preAggregationsSchema: ({ securityContext }) => {
     const env = process.env.NODE_ENV === 'production' ? 'prod' : 'dev';
     const cloud = securityContext?.cloud || 'default';
-    return `${env}_pre_aggregations_${cloud}`;
+    const schema = `${env}_pre_aggregations_${cloud}`;
+    log.debug({ cloud, schema }, 'pre_agg_schema');
+    return schema;
   },
 
   logger: (msg, params) => {

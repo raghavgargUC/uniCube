@@ -1,4 +1,5 @@
 const { UNIWARE_CONFIG } = require('../config');
+const log = require('../logger');
 
 /**
  * Generates one scheduledRefreshContext per cloud host.
@@ -9,7 +10,9 @@ const { UNIWARE_CONFIG } = require('../config');
  * This function automatically covers all configured clouds.
  */
 async function scheduledRefreshContexts() {
-  return Object.keys(UNIWARE_CONFIG).map((cloud) => ({
+  const keys = Object.keys(UNIWARE_CONFIG);
+  log.debug({ clouds: keys, count: keys.length }, 'refresh_contexts');
+  return keys.map((cloud) => ({
     securityContext: { cloud, tenant_code: null },
   }));
 }
