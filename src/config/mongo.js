@@ -11,15 +11,22 @@ let _cache = { tenantCloud: null, subscriptions: null, ts: 0 };
 
 async function init() {
   const uri = process.env.MONGO_URI;
+  log.info({ uri: uri ? uri.replace(/\/\/.*@/, '//***@') : '(not set)' }, 'mongo_init_start');
   if (!uri) {
     log.warn('MONGO_URI not set — MongoRegistry disabled');
     return;
   }
-  client = new MongoClient(uri);
-  await client.connect();
-  db = client.db(process.env.MONGO_DB || 'unicube');
-  log.info({ db: db.databaseName }, 'mongo_connected');
-  await _refresh();
+  try {
+    client = new MongoClient(uri, { serverSelectionTimeoutMS: 5000 });
+    await client.connect();
+    db = client.db(process.env.MONGO_DB || 'uniCube');
+    log.info({ db: db.databaseName }, 'mongo_connected');
+    await _refresh();
+  } catch (err) {
+    log.error({ error: err.message }, 'mongo_init_failed');
+    client = null;
+    db = null;
+  }
 }
 
 async function close() {

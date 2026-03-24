@@ -1,4 +1,4 @@
-const { MongoRegistry } = require('../config');
+const { MongoRegistry, UNIWARE_CONFIG } = require('../config');
 const log = require('../logger');
 
 /**
@@ -22,8 +22,9 @@ async function scheduledRefreshContexts() {
   }));
 
   if (contexts.length === 0) {
-    log.warn('refresh_contexts: no subscribed tenants found, returning dummy context');
-    return [{ securityContext: { tenant_code: '__none__', cloud: 'default' } }];
+    const fallbackCloud = Object.keys(UNIWARE_CONFIG)[0] || 'default';
+    log.warn({ fallbackCloud }, 'refresh_contexts: no subscribed tenants, using idle fallback');
+    return [{ securityContext: { tenant_code: '__idle__', cloud: fallbackCloud } }];
   }
 
   log.debug(
