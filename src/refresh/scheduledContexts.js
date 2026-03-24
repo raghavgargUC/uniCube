@@ -14,11 +14,12 @@ async function scheduledRefreshContexts() {
   await MongoRegistry.init();
   const tenants = MongoRegistry.getSubscribedTenants();
 
-  const contexts = tenants.map((t) => ({
+  const contexts = tenants.map((t, idx) => ({
     securityContext: {
       tenant_code: t.tenant_code,
       cloud: t.cloud,
       subscriptions: t.subscriptions,
+      _slot: idx,
     },
   }));
 

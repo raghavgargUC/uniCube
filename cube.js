@@ -90,9 +90,17 @@ module.exports = {
     const isError = /error/i.test(msg);
     const level = isError ? 'error' : 'info';
     const { securityContext, ...rest } = params;
+    const slot = securityContext?._slot;
+
+    if (msg === 'Executing SQL') {
+      log.info(
+        { slot, tenant: securityContext?.tenant_code, cloud: securityContext?.cloud, query: rest.query },
+        'DB_QUERY_HIT',
+      );
+    }
 
     log[level](
-      { tenant: securityContext?.tenant_code, cloud: securityContext?.cloud, msg, ...rest },
+      { slot, tenant: securityContext?.tenant_code, cloud: securityContext?.cloud, msg, ...rest },
       msg,
     );
   },
