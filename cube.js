@@ -24,6 +24,10 @@ module.exports = {
   queryRewrite,
   scheduledRefreshContexts,
 
+  contextToAppId: ({ securityContext }) => {
+    return securityContext?.cloud || 'default';
+  },
+
   schemaVersion: ({ securityContext }) => {
     const cloud = securityContext?.cloud || 'default';
     log.debug({ cloud }, 'schema_version');
